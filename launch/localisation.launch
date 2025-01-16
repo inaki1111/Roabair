@@ -1,0 +1,14 @@
+<launch>
+   
+    <arg name="map_file" default="$(find follow_me)/maps/2nd_floor.yaml" />
+
+    <!--<node name="tracker" pkg="follow_me" type="tracker" output="screen" />-->
+
+    <!-- Launch the map server -->
+    <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)" output="screen" />
+
+       <node name="rosbag_player" pkg="rosbag" type="play" args="$(find follow_me)/bags/localisation/localization_bag-2nd_floor_ufr-m1_robotics_dec_2023.bag -r 0.5 --loop" />
+
+    <!-- Launch RViz -->
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find follow_me)/rviz/localisation.rviz" output="screen" />
+</launch>

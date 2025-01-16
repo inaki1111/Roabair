@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <!-- Puzzlebot Parameters -->
+    <arg name="robot" default="puzzlebot_1"/>
+    <arg name="robot_description_file" default="puzzlebot_lidar.xacro"/>
+    <arg name="x" default="0.8"/>
+    <arg name="y" default="-0.5"/>
+    <arg name="z" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+
+    <!-- Gazebo Parameters -->
+    <arg name="world_name" default="$(find arrow_autonomusnavigation_puzzlebot)/worlds/ADJIC_map.world"/>
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+
+    <!-- Ensure all nodes use simulation time -->
+    <param name="/use_sim_time" value="true"/>
+
+    <!-- Load Puzzlebot Description -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find arrow_autonomusnavigation_puzzlebot)/urdf/$(arg robot_description_file)'"/>
+
+    <!-- Launch Gazebo -->
+    <node name="gazebo" pkg="gazebo_ros" type="gazebo" output="screen"
+          args="-s libgazebo_ros_factory.so $(arg world_name)" />
+
+    <!-- Spawn Puzzlebot -->
+    <node name="puzzlebot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+          args="-urdf -param robot_description -model $(arg robot) -x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw)" />
+
+
+    <!-- Robot State Publisher -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+        <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find arrow_autonomusnavigation_puzzlebot)/urdf/$(arg robot_description_file)'"/>
+    </node>
+
+    <!-- Puzzlebot Controller -->
+    <node name="puzzlebot_controller" pkg="puzzlebot_control" type="puzzlebot_control_node"/>
+
+    <!-- Include Puzzlebot Control Launch -->
+    <include file="$(find puzzlebot_control)/launch/puzzlebot_control.launch"/>
+
+    <!-- Custom Python Nodes -->
+    <node name="Joint_State_Publisher" pkg="arrow_autonomusnavigation_puzzlebot" type="Joint_State_Publisher.py" output="screen"/> 
+    <node name="localisation" pkg="arrow_autonomusnavigation_puzzlebot" type="localisation.py" output="screen"/>     
+    <node name="Cordinate_Transform" pkg="arrow_autonomusnavigation_puzzlebot" type="Cordinate_Transform.py" output="screen"/>     
+
+    <!-- Keyboard Control Python Node -->
+    <node name="keyboard_control" pkg="arrow_autonomusnavigation_puzzlebot" type="keyboard_control.py" output="screen"/>
+
+</launch>

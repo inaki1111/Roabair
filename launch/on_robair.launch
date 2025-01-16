@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <!-- launch the person detector-->
+    <node name="laser_data" pkg="follow_me" type="laser_data" output="screen" />
+
+<!--track-->
+    <node name="tracker" pkg="follow_me" type="tracker" output="screen" />
+
+
+    <!-- the rosbag -->
+   <!-- <node name="rosbag_player" pkg="rosbag" type="play" args="$(find follow_me)/data/datmo/detection/detection01.bag -r 0.5 loop" /> -->
+
+    <!-- launch de rviz-->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find follow_me)/rviz/follow_me.rviz" />
+</launch>
+
